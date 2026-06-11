@@ -1,1 +1,118 @@
-source code
+from google.colab import files
+
+uploaded = files.upload()
+import pandas as pd
+df = pd.read_csv("ecommerce_return_dataset_task5.csv")
+print("Rows and Columns:", df.shape)
+df.info()
+df.isnull().sum()
+df.drop_duplicates(inplace=True)
+print(len(df))
+returned = df[df['Returned']=='Yes']
+print(len(returned))
+return_rate = (len(returned)/len(df))*100
+print(return_rate)
+import pandas as pd
+df = pd.read_csv("ecommerce_return_dataset_task5.csv")
+df.mean(numeric_only=True)
+df.median(numeric_only=True)
+df.std(numeric_only=True)
+df.describe()
+import matplotlib.pyplot as plt
+plt.figure(figsize=(6,4))
+plt.hist(df['Price'])
+plt.xlabel("Price")
+plt.ylabel("Frequency")
+plt.show()
+print(df['Delivery_Days'].mean())
+print(df['Price'].mean())
+print(df['Customer_Rating'].mean())
+category_return = pd.crosstab(df['Category'],df['Returned'])
+
+category_return.plot(kind='bar')
+plt.show()
+import seaborn as sns
+sns.boxplot(x='Returned',y='Price',data=df)
+plt.show()
+sns.boxplot(x='Returned',y='Delivery_Days',data=df)
+plt.show()
+sns.boxplot(x='Returned',y='Discount_Percent',data=df)
+plt.show()
+sns.boxplot(x='Returned',y='Customer_Rating',data=df)
+plt.show()
+sns.heatmap(df.corr(numeric_only=True),annot=True)
+plt.show()
+# Calculate return rate for each category
+category_return_rate = (
+    df.groupby('Category')['Returned']
+      .apply(lambda x: (x == 'Yes').mean() * 100)
+      .sort_values(ascending=False)
+)
+
+print(category_return_rate)
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(8,5))
+category_return_rate.plot(kind='bar')
+
+plt.title("Category-wise Return Rate")
+plt.xlabel("Category")
+plt.ylabel("Return Rate (%)")
+plt.xticks(rotation=45)
+
+plt.show()
+print("Highest Return Category:", category_return_rate.idxmax())
+print("Return Rate: {:.2f}%".format(category_return_rate.max()))
+discount_return = df.groupby('Returned')['Discount_Percent'].mean()
+
+print(discount_return)
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(6,4))
+sns.boxplot(x='Returned', y='Discount_Percent', data=df)
+
+plt.title("Discount Percentage vs Return Status")
+plt.xlabel("Returned")
+plt.ylabel("Discount Percentage")
+plt.show()
+sns.boxplot(df['Price'])
+plt.show()
+Q1 = df['Price'].quantile(0.25)
+Q3 = df['Price'].quantile(0.75)
+
+IQR = Q3-Q1
+
+lower = Q1-1.5*IQR
+upper = Q3+1.5*IQR
+
+outliers = df[(df['Price']<lower)|(df['Price']>upper)]
+
+outliers
+import numpy as np
+from scipy import stats
+z = np.abs(stats.zscore(df['Price']))
+
+df[z>3]
+from scipy import stats
+
+returned = df[df['Returned']=='Yes']['Delivery_Days']
+not_returned = df[df['Returned']=='No']['Delivery_Days']
+
+t,p = stats.ttest_ind(returned,not_returned)
+
+print(t)
+print(p)
+if p<0.05:
+    print("Reject H0")
+else:
+    print("Fail to Reject H0")
+customer_returns = df.groupby('Customer_ID')['Returned'].count()
+
+customer_returns.sort_values(ascending=False)
+premium = df[df['Price']>df['Price'].mean()]
+
+premium.head()
+discount = df[df['Discount_Percent']>df['Discount_Percent'].mean()]
+low_rating = df[df['Customer_Rating']<3]
+display(low_rating.head())
